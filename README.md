@@ -28,6 +28,8 @@ export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token)
 
 By default `var.project_id` is also billing project. This can be overriden by `var.billing_project_id`. Billing project is required for creating Cloud Vision API key.
 
+See [Quota Management Configuration](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#quota-management-configuration) in Terraform provider configuration.
+
 ### Quota
 
 In your region, ensure there's sufficient quota for [Performance](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-compute-classes) compute (CPUs per region, CPUs per region family), and Cloud Vision API
