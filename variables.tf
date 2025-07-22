@@ -3,6 +3,14 @@ variable "project_id" {
   description = "The ID of the project where the network will be created"
 }
 
+
+# https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#quota-management-configuration
+variable "billing_project_id" {
+  type        = string
+  description = "Required for billing for creating cloud vision API key. Defaults to var.project_id"
+  default     = ""
+}
+
 variable "region" {
   type        = string
   description = "The region where the network will be created"
