@@ -7,12 +7,28 @@ Deploy Reducto on Google Kubernetes Engine using Terraform
 
 ### Credentials 
 
+Use one of the methods:
+
+#### 1. Application Default Credentials
+
+```
+gcloud auth application-default login
+```
+
+#### 2. OAuth Access Token
+
 For Terraform to use your [gcloud credentials](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#access_token-1), run:
 
 ```
 gcloud auth login
 export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token)
 ```
+
+### Billing Project
+
+By default `var.project_id` is also billing project. This can be overriden by `var.billing_project_id`. Billing project is required for creating Cloud Vision API key.
+
+See [Quota Management Configuration](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#quota-management-configuration) in Terraform provider configuration.
 
 ### Quota
 
