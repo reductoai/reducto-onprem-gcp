@@ -31,3 +31,8 @@ output "service_account_key" {
   value       = local.service_account_key
   sensitive   = true
 }
+
+output "vpc_network_name" {
+  description = "The name of the VPC network created for Reducto"
+  value       = module.network.network_name
+}
