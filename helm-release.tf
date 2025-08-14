@@ -51,7 +51,7 @@ resource "helm_release" "reducto" {
       GCP_API_KEY: ${google_apikeys_key.vision.key_string}
       GCP_ACCESS_KEY_ID: ${google_storage_hmac_key.s3_compatible_key.access_id}
       GCP_SECRET_ACCESS_KEY: ${google_storage_hmac_key.s3_compatible_key.secret}
-      GOOGLE_APPLICATION_CREDENTIALS: ${local.service_account_key}
+      GOOGLE_APPLICATION_CREDENTIALS: ${local.service_account_key_json}
       BUCKET: ${google_storage_bucket.private_bucket.name}
       DATABASE_URL: ${local.database_url}
     EOT
