@@ -26,4 +26,5 @@ resource "google_service_account_key" "service_account_key" {
 
 locals {
   service_account_key = base64decode(google_service_account_key.service_account_key.private_key)
+  service_account_key_json = jsonencode(local.service_account_key)
 }
