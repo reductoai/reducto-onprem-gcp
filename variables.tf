@@ -29,6 +29,11 @@ variable "subnet_name" {
   default     = "reducto-subnet"
 }
 
+variable "router_name" {
+  type    = string
+  default = "reducto-nat-router"
+}
+
 variable "subnet_cidr" {
   type        = string
   description = "The CIDR block for the subnet"
@@ -40,6 +45,10 @@ variable "regional_proxy_subnet_cidr" {
   type        = string
   description = "The CIDR block for the regional proxy subnet for internal load balancing"
   default     = "10.129.0.0/16"
+}
+
+variable "regional_proxy_subnet_name" {
+  default = "reducto-regional-proxy"
 }
 
 variable "pods_cidr_name" {
@@ -120,7 +129,7 @@ variable "reducto_helm_repo_password" {
 
 variable "reducto_helm_chart_version" {
   description = "Reducto Helm Chart version"
-  default     = "1.9.93"
+  default     = "1.10.7"
 }
 
 variable "reducto_helm_chart_oci" {
@@ -130,6 +139,10 @@ variable "reducto_helm_chart_oci" {
 
 variable "reducto_host" {
   description = "Host for Reducto Ingress"
+}
+
+variable "reducto_service_account_name" {
+  default = "reducto-sa"
 }
 
 variable "db_availability_type" {

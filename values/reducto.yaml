@@ -2,6 +2,32 @@ http:
   service:
     annotations:
       cloud.google.com/neg: '{"ingress": true}'
+  podDisruptionBudget:
+    enabled: true
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 4
+      memory: 5Gi
+    limits:
+      memory: 5Gi
+
+  maxSurge: 100%
+  maxUnavailable: 0
+  terminationGracePeriodSeconds: 300
+
+worker:
+  podDisruptionBudget:
+    enabled: true
+  kedaScaler: true
+  scaling:
+    minReplicaCount: 5
+    maxReplicaCount: 100
+
+  resources:
+    requests:
+      cpu: 8
+      memory: 10Gi
 
 ingress:
   className: gce-internal

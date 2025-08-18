@@ -13,7 +13,7 @@ module "network" {
       subnet_private_access = true
     },
     {
-      subnet_name   = "reducto-regional-proxy"
+      subnet_name   = var.regional_proxy_subnet_name
       subnet_ip     = var.regional_proxy_subnet_cidr
       subnet_region = var.region
       role          = "ACTIVE"
@@ -38,7 +38,7 @@ module "network" {
 # NAT and router to allowed private nodes to download Reducto image
 resource "google_compute_router" "router" {
   project = var.project_id
-  name    = "reducto-nat-router"
+  name    = var.router_name
   network = module.network.network_name
   region  = var.region
 }
