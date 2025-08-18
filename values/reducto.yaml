@@ -35,9 +35,3 @@ ingress:
     kubernetes.io/ingress.class: gce-internal
   tls:
     enabled: false
-
-
-worker:
-  nodeSelector:
-    # https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-compute-classes
-    cloud.google.com/compute-class: Performance
