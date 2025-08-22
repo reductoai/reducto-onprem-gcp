@@ -67,7 +67,7 @@ Ensure that domain name in `var.reducto_host` resolves to IP of internal load ba
 
 ### Notes on Destroy
 
-On `terraform destroy` you may get following error, to resolve it manually delete from VPC under "VPC network peering" tab, and rerun `terraform destroy`.
+To delete, set `deletion_protection = false` and run `terraform destroy`. You may get following error, to resolve it manually delete from VPC under "VPC network peering" tab, and rerun `terraform destroy`.
 
 <details>
 <summary>
