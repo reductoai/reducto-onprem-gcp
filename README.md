@@ -32,13 +32,12 @@ See [Quota Management Configuration](https://registry.terraform.io/providers/has
 
 ### Quota
 
-In your region, ensure there's sufficient quota for [Performance](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-compute-classes) compute (CPUs per region, CPUs per region family), and Cloud Vision API
-https://console.cloud.google.com/iam-admin/quotas
+In your region, ensure there's sufficient quota for [Compute Optimized](https://cloud.google.com/compute/docs/compute-optimized-machines) instances (CPUs per region, CPU family per region), and Cloud Vision API https://console.cloud.google.com/iam-admin/quotas
 
 
 ### Security
 
-A GKE autopilot cluster is provisioned with private nodes without public IP. Postgres instance is provisioned in private network without public IP. 
+A GKE cluster is provisioned with private nodes without public IP. Postgres instance is provisioned in private network without public IP.
 
 GKE control plane is provisioned with both public and private IP - but access is limited to VPC and CIDR provided in `var.control_plane_allowed_cidrs`
 
