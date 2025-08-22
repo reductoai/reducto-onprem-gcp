@@ -29,6 +29,11 @@ worker:
       cpu: 8
       memory: 10Gi
 
+# # Only when using GKE Autopilot
+#   nodeSelector:
+#     # https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-compute-classes
+#     cloud.google.com/compute-class: Performance
+
 ingress:
   className: gce-internal
   annotations:
