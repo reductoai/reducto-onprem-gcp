@@ -64,3 +64,17 @@ terraform apply
 ### DNS 
 
 Ensure that domain name in `var.reducto_host` resolves to IP of internal load balancer of Reducto Ingress.
+
+### Notes on Destroy
+
+On `terraform destroy` you may get following error, to resolve it manually delete from VPC under "VPC network peering" tab, and rerun `terraform destroy`.
+
+<details>
+<summary>
+Service Networking Connection
+</summary>
+
+```
+│ Error: Unable to remove Service Networking Connection, err: Error waiting for Delete Service Networking Connection: Error code 9, message: Failed to delete connection; Producer services (e.g. CloudSQL, Cloud Memstore, etc.) are still using this connection.
+```
+</details>
