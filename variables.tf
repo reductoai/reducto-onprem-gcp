@@ -128,8 +128,8 @@ variable "reducto_helm_repo_password" {
 }
 
 variable "reducto_helm_chart_version" {
-  description = "Reducto Helm Chart version"
-  default     = "1.10.7"
+  description = "Reducto Helm Chart version, obtain latest version from https://docs.reducto.ai/onprem/changelog"
+  default     = "1.10.8"
 }
 
 variable "reducto_helm_chart_oci" {
