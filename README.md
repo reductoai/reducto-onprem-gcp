@@ -43,6 +43,14 @@ GKE control plane is provisioned with both public and private IP - but access is
 
 ### Terraform 
 
+#### Terraform State
+
+To use a bucket for Terraform state, create a bucket and update `backend.tf`.
+
+OR you can skip this to quickly run Terraform plan and apply with locally managed `terraform.tfstate` state file for testing purposes.
+
+#### Plan and Apply
+
 At a minimum create a `terraform.tfvars` with following configuration:
 
 ```terraform
