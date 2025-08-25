@@ -1,5 +1,5 @@
 resource "google_service_account" "service_account" {
-  account_id   = "reducto-sa"
+  account_id   = var.reducto_service_account_name
   display_name = "Reducto Service Account"
   project      = var.project_id
 }
@@ -25,6 +25,6 @@ resource "google_service_account_key" "service_account_key" {
 }
 
 locals {
-  service_account_key = base64decode(google_service_account_key.service_account_key.private_key)
+  service_account_key      = base64decode(google_service_account_key.service_account_key.private_key)
   service_account_key_json = jsonencode(local.service_account_key)
 }
