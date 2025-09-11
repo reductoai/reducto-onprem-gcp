@@ -9,8 +9,6 @@ resource "kubectl_manifest" "namespace" {
     metadata:
       name: reducto
     EOT
-
-  depends_on = [module.gke]
 }
 
 resource "kubectl_manifest" "backend_config" {
@@ -37,7 +35,7 @@ resource "helm_release" "reducto" {
 
   chart   = var.reducto_helm_chart_oci
   version = var.reducto_helm_chart_version
-  wait    = true
+  wait    = false
 
   values = [
     "${file("values/reducto.yaml")}",
@@ -67,12 +65,4 @@ resource "helm_release" "reducto" {
     helm_release.keda,
     kubectl_manifest.backend_config,
   ]
-}
-
-data "kubernetes_ingress_v1" "ingress" {
-  metadata {
-    name      = "${helm_release.reducto.name}-reducto-http-ingress"
-    namespace = kubectl_manifest.namespace.name
-  }
-  depends_on = [helm_release.reducto]
 }
