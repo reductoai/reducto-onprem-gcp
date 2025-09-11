@@ -36,8 +36,3 @@ output "vpc_network_name" {
   description = "The name of the VPC network created for Reducto"
   value       = module.network.network_name
 }
-
-output "ingress_forwarding_rule_name" {
-  description = "The name of the forwarding rule created for reducto via k8s ingress"
-  value = lookup(data.kubernetes_ingress.ingress.metadata.annotations, "ingress.kubernetes.io/forwarding-rule", null)
-}
