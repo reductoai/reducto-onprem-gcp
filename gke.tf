@@ -18,7 +18,7 @@ module "gke" {
   remove_default_node_pool  = true
   deletion_protection       = var.deletion_protection
 
-  node_pools = [
+  node_pools = concat([
     {
       name              = "reducto-c2d-highcpu-8"
       machine_type      = "c2d-highcpu-8"
@@ -58,7 +58,7 @@ module "gke" {
       preemptible       = true
       max_pods_per_node = 20
     },
-  ]
+  ], var.extra_node_pools)
 
   master_authorized_networks = [
     for cidr in concat(var.control_plane_allowed_cidrs, [var.subnet_cidr, var.pods_cidr, var.services_cidr]) : {

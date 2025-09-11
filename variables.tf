@@ -154,3 +154,11 @@ variable "db_tier" {
   description = "Tier for the database"
   default     = "db-custom-4-8192"
 }
+
+variable "extra_node_pools" {
+  # see node pool options at https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/blob/main/examples/simple_regional_private/main.tf
+  type        = list(map(any))
+  description = "List of maps containing extra node pools"
+
+  default = []
+}
