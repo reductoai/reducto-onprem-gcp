@@ -9,8 +9,6 @@ resource "kubectl_manifest" "namespace" {
     metadata:
       name: reducto
     EOT
-
-  depends_on = [module.gke]
 }
 
 resource "kubectl_manifest" "backend_config" {
@@ -69,10 +67,9 @@ resource "helm_release" "reducto" {
   ]
 }
 
-data "kubernetes_ingress_v1" "ingress" {
+data "kubernetes_ingress" "ingress" {
   metadata {
-    name      = "${helm_release.reducto.name}-reducto-http-ingress"
-    namespace = kubectl_manifest.namespace.name
+    name = "${helm_release.reducto.name}-reducto-http-ingress"
   }
   depends_on = [helm_release.reducto]
 }
