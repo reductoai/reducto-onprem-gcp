@@ -66,3 +66,10 @@ resource "helm_release" "reducto" {
     kubectl_manifest.backend_config,
   ]
 }
+
+data "kubernetes_ingress" "ingress" {
+  metadata {
+    name = "reducto-reducto-http-ingress"
+  }
+  depends_on = [helm_release.reducto]
+}
