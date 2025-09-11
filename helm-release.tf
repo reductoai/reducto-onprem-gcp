@@ -35,7 +35,7 @@ resource "helm_release" "reducto" {
 
   chart   = var.reducto_helm_chart_oci
   version = var.reducto_helm_chart_version
-  wait    = false
+  wait    = true
 
   values = [
     "${file("values/reducto.yaml")}",
@@ -69,7 +69,7 @@ resource "helm_release" "reducto" {
 
 data "kubernetes_ingress" "ingress" {
   metadata {
-    name = "reducto-reducto-http-ingress"
+    name = "${helm_release.reducto.name}-reducto-http-ingress"
   }
   depends_on = [helm_release.reducto]
 }

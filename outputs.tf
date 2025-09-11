@@ -39,5 +39,5 @@ output "vpc_network_name" {
 
 output "ingress_forwarding_rule_name" {
   description = "The name of the forwarding rule created for reducto via k8s ingress"
-  value = data.kubernetes_ingress.ingress.metadata.annotations["ingress.kubernetes.io/forwarding-rule"]
+  value = lookup(data.kubernetes_ingress.ingress.metadata.annotations, "ingress.kubernetes.io/forwarding-rule", null)
 }
