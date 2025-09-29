@@ -29,6 +29,11 @@ variable "subnet_name" {
   default     = "reducto-subnet"
 }
 
+variable "router_name" {
+  type    = string
+  default = "reducto-nat-router"
+}
+
 variable "subnet_cidr" {
   type        = string
   description = "The CIDR block for the subnet"
@@ -40,6 +45,10 @@ variable "regional_proxy_subnet_cidr" {
   type        = string
   description = "The CIDR block for the regional proxy subnet for internal load balancing"
   default     = "10.129.0.0/16"
+}
+
+variable "regional_proxy_subnet_name" {
+  default = "reducto-regional-proxy"
 }
 
 variable "pods_cidr_name" {
@@ -119,8 +128,8 @@ variable "reducto_helm_repo_password" {
 }
 
 variable "reducto_helm_chart_version" {
-  description = "Reducto Helm Chart version"
-  default     = "1.9.93"
+  description = "Reducto Helm Chart version, obtain latest version from https://docs.reducto.ai/onprem/changelog"
+  default     = "1.10.8"
 }
 
 variable "reducto_helm_chart_oci" {
@@ -132,6 +141,10 @@ variable "reducto_host" {
   description = "Host for Reducto Ingress"
 }
 
+variable "reducto_service_account_name" {
+  default = "reducto-sa"
+}
+
 variable "db_availability_type" {
   description = "Availability type for the database"
   default     = "REGIONAL"
@@ -140,4 +153,12 @@ variable "db_availability_type" {
 variable "db_tier" {
   description = "Tier for the database"
   default     = "db-custom-4-8192"
+}
+
+variable "extra_node_pools" {
+  # see node pool options at https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/blob/main/examples/simple_regional_private/main.tf
+  type        = list(map(any))
+  description = "List of maps containing extra node pools"
+
+  default = []
 }

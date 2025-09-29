@@ -2,6 +2,37 @@ http:
   service:
     annotations:
       cloud.google.com/neg: '{"ingress": true}'
+  podDisruptionBudget:
+    enabled: true
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 4
+      memory: 5Gi
+    limits:
+      memory: 5Gi
+
+  maxSurge: 100%
+  maxUnavailable: 0
+  terminationGracePeriodSeconds: 300
+
+worker:
+  podDisruptionBudget:
+    enabled: true
+  kedaScaler: true
+  scaling:
+    minReplicaCount: 5
+    maxReplicaCount: 100
+
+  resources:
+    requests:
+      cpu: 8
+      memory: 10Gi
+
+# # Only when using GKE Autopilot
+#   nodeSelector:
+#     # https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-compute-classes
+#     cloud.google.com/compute-class: Performance
 
 ingress:
   className: gce-internal
@@ -9,9 +40,3 @@ ingress:
     kubernetes.io/ingress.class: gce-internal
   tls:
     enabled: false
-
-
-worker:
-  nodeSelector:
-    # https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-compute-classes
-    cloud.google.com/compute-class: Performance
