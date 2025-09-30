@@ -73,6 +73,10 @@ terraform apply
 
 Ensure that domain name in `var.reducto_host` resolves to IP of internal load balancer of Reducto Ingress.
 
+### FQDN Network Policy and Workload Identity
+
+When using `FQDNNetworkPolicy` you must allow `name: metadata.google.internal` when Workload Identity is enabled via `var.workload_identity=true`.
+
 ### Notes on Destroy
 
 To delete, set `deletion_protection = false` and run `terraform destroy`. You may get following error, to resolve it manually delete from VPC under "VPC network peering" tab, and rerun `terraform destroy`.
