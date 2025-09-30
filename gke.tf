@@ -18,6 +18,10 @@ module "gke" {
   remove_default_node_pool  = true
   deletion_protection       = var.deletion_protection
 
+  # Dataplane V2 and FQDN Network policy
+  datapath_provider          = "ADVANCED_DATAPATH"
+  enable_fqdn_network_policy = true
+
   node_pools = concat([
     {
       name              = "reducto-c2d-highcpu-8"

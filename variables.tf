@@ -162,3 +162,8 @@ variable "extra_node_pools" {
 
   default = []
 }
+
+variable "workload_identity" {
+  description = "Whether to use workload identity"
+  default     = false
+}
