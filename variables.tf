@@ -155,10 +155,43 @@ variable "db_tier" {
   default     = "db-custom-4-8192"
 }
 
+variable "system_gpu_machine_type" {
+  description = "Machine type used for the system GPU node pool"
+  type        = string
+  default     = "a3-highgpu-8g"
+}
+
+variable "system_gpu_accelerator_type" {
+  description = "Accelerator type attached to the system GPU node pool"
+  type        = string
+  default     = "nvidia-h100-80gb"
+}
+
 variable "extra_node_pools" {
   # see node pool options at https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/blob/main/examples/simple_regional_private/main.tf
   type        = list(map(any))
   description = "List of maps containing extra node pools"
 
   default = []
+}
+
+# Configuration for vLLM
+
+variable "enable_nvidia_device_plugin" {
+  type        = bool
+  default     = false
+  description = "Whether to install the NVIDIA device plugin for GPU support"
+}
+
+variable "enable_vllm_stack" {
+  type        = bool
+  default     = false
+  description = "Whether to deploy the vLLM stack on the cluster"
+}
+
+variable "vllm_stack_hf_token" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Hugging Face API token used by the vLLM stack for model access"
 }

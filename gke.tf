@@ -58,7 +58,44 @@ module "gke" {
       preemptible       = true
       max_pods_per_node = 20
     },
+    {
+      name              = "system-gpu"
+      machine_type      = var.system_gpu_machine_type
+      min_count         = 0
+      max_count         = 2
+      local_ssd_count   = 0
+      disk_size_gb      = 200
+      disk_type         = "pd-ssd"
+      auto_repair       = true
+      auto_upgrade      = true
+      preemptible       = false
+      max_pods_per_node = 20
+      image_type        = "UBUNTU_CONTAINERD"
+      accelerators = [{
+        accelerator_count = 1
+        accelerator_type  = var.system_gpu_accelerator_type
+      }]
+      gpu_driver_version = "LATEST"
+    },
   ], var.extra_node_pools)
+
+  node_pools_labels = {
+    "system-gpu" = {
+      worker-type              = "system-gpu"
+      gpu_arch                 = "NVIDIAH100"
+      "nvidia.com/gpu.present" = "true"
+    }
+  }
+
+  node_pools_taints = {
+    "system-gpu" = [
+      {
+        key    = "nvidia.com/gpu"
+        value  = "true"
+        effect = "NO_SCHEDULE"
+      }
+    ]
+  }
 
   master_authorized_networks = [
     for cidr in concat(var.control_plane_allowed_cidrs, [var.subnet_cidr, var.pods_cidr, var.services_cidr]) : {
