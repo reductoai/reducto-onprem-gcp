@@ -14,49 +14,54 @@ module "gke" {
   create_service_account    = true
   enable_private_endpoint   = false
   enable_private_nodes      = true
+  enable_intranode_visibility = true
+  enable_shielded_nodes     = true
   default_max_pods_per_node = 20
   remove_default_node_pool  = true
   deletion_protection       = var.deletion_protection
 
   node_pools = concat([
     {
-      name              = "reducto-c2d-highcpu-8"
-      machine_type      = "c2d-highcpu-8"
-      min_count         = 1
-      max_count         = 100
-      local_ssd_count   = 1
-      disk_size_gb      = 100
-      disk_type         = "pd-ssd"
-      auto_repair       = true
-      auto_upgrade      = true
-      preemptible       = false
-      max_pods_per_node = 20
+      name                = "reducto-c2d-highcpu-8"
+      machine_type        = "c2d-highcpu-8"
+      min_count           = 1
+      max_count           = 100
+      local_ssd_count     = 1
+      disk_size_gb        = 100
+      disk_type           = "pd-ssd"
+      auto_repair         = true
+      auto_upgrade        = true
+      preemptible         = false
+      max_pods_per_node   = 20
+      enable_secure_boot  = true
     },
     {
-      name              = "reducto-c2d-highcpu-16"
-      machine_type      = "c2d-highcpu-16"
-      min_count         = 1
-      max_count         = 100
-      local_ssd_count   = 1
-      disk_size_gb      = 100
-      disk_type         = "pd-ssd"
-      auto_repair       = true
-      auto_upgrade      = true
-      preemptible       = false
-      max_pods_per_node = 20
+      name                = "reducto-c2d-highcpu-16"
+      machine_type        = "c2d-highcpu-16"
+      min_count           = 1
+      max_count           = 100
+      local_ssd_count     = 1
+      disk_size_gb        = 100
+      disk_type           = "pd-ssd"
+      auto_repair         = true
+      auto_upgrade        = true
+      preemptible         = false
+      max_pods_per_node   = 20
+      enable_secure_boot  = true
     },
     {
-      name              = "reducto-c2d-highcpu-16-preemptible"
-      machine_type      = "c2d-highcpu-16"
-      min_count         = 0
-      max_count         = 100
-      local_ssd_count   = 1
-      disk_size_gb      = 100
-      disk_type         = "pd-ssd"
-      auto_repair       = true
-      auto_upgrade      = true
-      preemptible       = true
-      max_pods_per_node = 20
+      name                = "reducto-c2d-highcpu-16-preemptible"
+      machine_type        = "c2d-highcpu-16"
+      min_count           = 0
+      max_count           = 100
+      local_ssd_count     = 1
+      disk_size_gb        = 100
+      disk_type           = "pd-ssd"
+      auto_repair         = true
+      auto_upgrade        = true
+      preemptible         = true
+      max_pods_per_node   = 20
+      enable_secure_boot  = true
     },
   ], var.extra_node_pools)
 
