@@ -21,7 +21,7 @@ module "gke" {
   node_pools = concat([
     {
       name              = "reducto-c2d-highcpu-8"
-      machine_type      = "c2d-highcpu-8"
+      machine_type      = var.primary_machine_type
       min_count         = 1
       max_count         = 100
       local_ssd_count   = 1
@@ -34,7 +34,7 @@ module "gke" {
     },
     {
       name              = "reducto-c2d-highcpu-16"
-      machine_type      = "c2d-highcpu-16"
+      machine_type      = var.secondary_machine_type
       min_count         = 1
       max_count         = 100
       local_ssd_count   = 1
@@ -47,7 +47,7 @@ module "gke" {
     },
     {
       name              = "reducto-c2d-highcpu-16-preemptible"
-      machine_type      = "c2d-highcpu-16"
+      machine_type      = var.secondary_machine_type
       min_count         = 0
       max_count         = 100
       local_ssd_count   = 1
