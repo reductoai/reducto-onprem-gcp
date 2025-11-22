@@ -155,6 +155,16 @@ variable "db_tier" {
   default     = "db-custom-4-8192"
 }
 
+variable "primary_machine_type" {
+  description = "Machine type for primary node pool (c2d-highcpu-8 equivalent)"
+  default     = "c2d-highcpu-8"
+}
+
+variable "secondary_machine_type" {
+  description = "Machine type for secondary node pool (c2d-highcpu-16 equivalent)"
+  default     = "c2d-highcpu-16"
+}
+
 variable "extra_node_pools" {
   # see node pool options at https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/blob/main/examples/simple_regional_private/main.tf
   type        = list(map(any))
