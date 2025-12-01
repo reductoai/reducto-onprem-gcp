@@ -38,5 +38,7 @@ ingress:
   className: gce-internal
   annotations:
     kubernetes.io/ingress.class: gce-internal
+    # Reference FrontendConfig for SSL policy (TLS 1.2+ only)
+    networking.gke.io/v1beta1.FrontendConfig: reducto-frontendconfig
   tls:
     enabled: false

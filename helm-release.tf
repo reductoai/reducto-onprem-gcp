@@ -64,5 +64,6 @@ resource "helm_release" "reducto" {
     module.network,
     helm_release.keda,
     kubectl_manifest.backend_config,
+    kubectl_manifest.frontend_config,
   ]
 }
