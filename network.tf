@@ -5,6 +5,8 @@ module "network" {
   project_id   = var.project_id
   network_name = var.network_name
 
+  bgp_best_path_selection_mode = "STANDARD"
+
   subnets = [
     {
       subnet_name           = var.subnet_name
