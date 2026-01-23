@@ -172,3 +172,16 @@ variable "extra_node_pools" {
 
   default = []
 }
+
+# Configuration for Datadog
+
+variable "datadog_site" {
+  description = "Datadog site"
+  default     = "us3.datadoghq.com"
+}
+
+variable "datadog_api_key" {
+  description = "Datadog API key"
+  sensitive   = true
+  default     = ""
+}
