@@ -178,3 +178,16 @@ variable "reducto_worker_min_replica_count" {
   type = number
   default = 5
 }
+
+# Configuration for Datadog
+
+variable "datadog_site" {
+  description = "Datadog site"
+  default     = "us3.datadoghq.com"
+}
+
+variable "datadog_api_key" {
+  description = "Datadog API key"
+  sensitive   = true
+  default     = ""
+}
