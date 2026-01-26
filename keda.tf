@@ -7,7 +7,7 @@ resource "helm_release" "keda" {
   create_namespace = true
 
   values = [
-    "${file("values/keda.yaml")}"
+    "${file("${path.module}/values/keda.yaml")}"
   ]
 
   depends_on = [

@@ -46,7 +46,7 @@ resource "helm_release" "datadog" {
   wait             = false
 
   values = [
-    "${file("values/datadog.yaml")}",
+    "${file("${path.module}/values/datadog.yaml")}",
     <<-EOT
     datadog:
       site: ${var.datadog_site}
