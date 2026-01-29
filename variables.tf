@@ -17,6 +17,11 @@ variable "region" {
   default     = "us-west1"
 }
 
+variable "zones" {
+  type        = list(string)
+  description = "Explicit list of zones for the GKE cluster (required). See https://github.com/hashicorp/terraform-provider-google/issues/25914"
+}
+
 variable "network_name" {
   type        = string
   description = "The name of the network to create"
