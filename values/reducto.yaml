@@ -27,7 +27,7 @@ worker:
   resources:
     requests:
       cpu: 8
-      memory: 10Gi
+      memory: 18Gi
 
 # # Only when using GKE Autopilot
 #   nodeSelector:
