@@ -36,3 +36,23 @@ output "vpc_network_name" {
   description = "The name of the VPC network created for Reducto"
   value       = module.network.network_name
 }
+
+output "artifact_registry_repository_id" {
+  description = "Artifact Registry repository ID"
+  value       = google_artifact_registry_repository.main.repository_id
+}
+
+output "artifact_registry_location" {
+  description = "Region where the Artifact Registry repository is hosted"
+  value       = google_artifact_registry_repository.main.location
+}
+
+output "artifact_registry_docker_url" {
+  description = "Docker registry hostname for docker push/pull (REGION-docker.pkg.dev/PROJECT/REPO)"
+  value       = "${google_artifact_registry_repository.main.location}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.main.repository_id}"
+}
+
+output "artifact_registry_push_service_account_email" {
+  description = "Service account email for pushing images to Artifact Registry (use with Workload Identity Federation, gcloud auth activate-service-account, or a manually created key)"
+  value       = google_service_account.artifact_registry_push.email
+}
