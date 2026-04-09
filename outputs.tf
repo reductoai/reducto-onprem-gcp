@@ -51,3 +51,8 @@ output "artifact_registry_docker_url" {
   description = "Docker registry hostname for docker push/pull (REGION-docker.pkg.dev/PROJECT/REPO)"
   value       = "${google_artifact_registry_repository.main.location}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.main.repository_id}"
 }
+
+output "artifact_registry_push_service_account_email" {
+  description = "Service account email for pushing images to Artifact Registry (use with Workload Identity Federation, gcloud auth activate-service-account, or a manually created key)"
+  value       = google_service_account.artifact_registry_push.email
+}

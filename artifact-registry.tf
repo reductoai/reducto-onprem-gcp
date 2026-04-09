@@ -21,3 +21,17 @@ resource "google_artifact_registry_repository_iam_member" "gke_nodes_pull" {
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${module.gke.service_account}"
 }
+
+resource "google_service_account" "artifact_registry_push" {
+  account_id   = var.artifact_registry_push_service_account_id
+  display_name = "Artifact Registry image push"
+  project      = var.project_id
+}
+
+resource "google_artifact_registry_repository_iam_member" "push_writer" {
+  project    = var.project_id
+  location   = google_artifact_registry_repository.main.location
+  repository = google_artifact_registry_repository.main.repository_id
+  role       = "roles/artifactregistry.writer"
+  member     = google_service_account.artifact_registry_push.member
+}

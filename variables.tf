@@ -108,6 +108,12 @@ variable "artifact_registry_location" {
   default     = ""
 }
 
+variable "artifact_registry_push_service_account_id" {
+  type        = string
+  description = "Account ID for the service account used to push images to Artifact Registry (not used by GKE nodes)"
+  default     = "reducto-gar-push"
+}
+
 variable "cluster_name" {
   type        = string
   description = "The name of the cluster"
