@@ -91,7 +91,21 @@ variable "enable_apis" {
     "apikeys.googleapis.com",
     # for Google Cloud Vision
     "vision.googleapis.com",
+    # for Artifact Registry (container images)
+    "artifactregistry.googleapis.com",
   ]
+}
+
+variable "artifact_registry_repository_id" {
+  type        = string
+  description = "Repository ID for the Google Artifact Registry (Docker format). Must match ^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$"
+  default     = "reducto-images"
+}
+
+variable "artifact_registry_location" {
+  type        = string
+  description = "GCP region for the Artifact Registry repository (often the same as var.region)"
+  default     = ""
 }
 
 variable "cluster_name" {
