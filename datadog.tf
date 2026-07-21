@@ -44,9 +44,10 @@ resource "helm_release" "datadog" {
   namespace        = "monitoring"
   create_namespace = false
   wait             = false
+  timeout          = var.helm_release_timeout
 
   values = [
-    "${file("${path.module}/values/datadog.yaml")}",
+    file("${path.module}/values/datadog.yaml"),
     <<-EOT
     datadog:
       site: ${var.datadog_site}

@@ -5,9 +5,10 @@ resource "helm_release" "keda" {
   version          = "2.15.0"
   namespace        = "keda-system"
   create_namespace = true
+  timeout          = var.helm_release_timeout
 
   values = [
-    "${file("${path.module}/values/keda.yaml")}"
+    file("${path.module}/values/keda.yaml")
   ]
 
   depends_on = [

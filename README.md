@@ -59,15 +59,41 @@ reducto_host               = "reducto.yourdomain.com"
 reducto_helm_chart_version = "..."
 reducto_helm_repo_username = "your-username"
 reducto_helm_repo_password = "your-password"
+
+# Keep disabled until the Memorystore private CA is wired into the chart.
+enable_managed_redis = false
 ```
 
 And then:
 
 ```sh
 terraform init
+
+# Required once in a new project. GKE's module queries available versions
+# during planning, so its API must be active before the first full plan.
+terraform apply -target=google_project_service.services
+
 terraform plan
 terraform apply
 ```
+
+For an existing deployment, preserve the current Cloud SQL application
+password by supplying the sensitive `database_password` input before applying
+this update. Leaving it null generates a password only for a fresh deployment.
+Never rotate this value as part of adding managed Redis or changing Terraform
+ownership.
+
+The default chart version is `1.12.2`. Its Streaq workloads remain disabled by
+default. When `enable_managed_redis` is true, Terraform provisions Memorystore
+for Redis over Private Service Access with AUTH and in-transit encryption, then
+passes its sensitive `rediss://` URL to the chart as `REDIS_URL`. The bundled
+Redis deployment remains disabled.
+
+> **Managed Redis TLS prerequisite:** Memorystore signs its endpoint with the
+> private CA exposed by the sensitive `redis_server_ca_certificate` output.
+> This Terraform root does not yet configure the chart's CA Secret and mount.
+> Keep `enable_managed_redis = false` until that wiring is present and verified.
+> Do not bypass verification or disable in-transit encryption.
 
 ### DNS 
 

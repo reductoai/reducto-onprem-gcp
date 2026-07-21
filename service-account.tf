@@ -2,6 +2,8 @@ resource "google_service_account" "service_account" {
   account_id   = var.reducto_service_account_name
   display_name = "Reducto Service Account"
   project      = var.project_id
+
+  depends_on = [google_project_service.services]
 }
 
 resource "google_storage_bucket_iam_member" "gcs_object_admin" {
@@ -25,6 +27,9 @@ resource "google_service_account_key" "service_account_key" {
 }
 
 locals {
-  service_account_key      = base64decode(google_service_account_key.service_account_key.private_key)
-  service_account_key_json = jsonencode(local.service_account_key)
+  service_account_key = base64decode(google_service_account_key.service_account_key.private_key)
+  # private_key is already a base64-encoded Google credentials JSON document.
+  # Encoding the decoded string again makes the application receive a JSON
+  # string rather than a credentials object.
+  service_account_key_json = local.service_account_key
 }
