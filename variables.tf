@@ -164,6 +164,19 @@ variable "enable_managed_redis" {
   default     = false
 }
 
+variable "mount_managed_redis_ca" {
+  type        = bool
+  description = "Whether Reducto consumes managed Redis with its private CA mounted. The legacy root cannot mount that CA, so this must remain false."
+  default     = false
+}
+
+check "legacy_managed_redis_is_unconsumed" {
+  assert {
+    condition     = !var.mount_managed_redis_ca
+    error_message = "The legacy root cannot mount Memorystore's private CA. Keep mount_managed_redis_ca=false and retain Redis as an unconsumed Terraform-owned resource."
+  }
+}
+
 variable "managed_redis_tier" {
   type        = string
   description = "Memorystore service tier. Use BASIC only for disposable development environments."
@@ -196,6 +209,17 @@ variable "reducto_helm_chart_oci" {
   type        = string
   description = "Path to Helm Chart on OCI registry"
   default     = "oci://registry.reducto.ai/reducto-api/reducto"
+}
+
+variable "reducto_extra_values_files" {
+  description = "Paths to additional Helm values files layered last. Use this for deployment-specific workload settings such as Streaq."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for values_path in var.reducto_extra_values_files : can(file(values_path))])
+    error_message = "Every reducto_extra_values_files entry must be a readable file path."
+  }
 }
 
 variable "reducto_host" {

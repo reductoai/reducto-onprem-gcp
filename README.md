@@ -85,9 +85,10 @@ ownership.
 
 The default chart version is `1.12.2`. Its Streaq workloads remain disabled by
 default. When `enable_managed_redis` is true, Terraform provisions Memorystore
-for Redis over Private Service Access with AUTH and in-transit encryption, then
-passes its sensitive `rediss://` URL to the chart as `REDIS_URL`. The bundled
-Redis deployment remains disabled.
+for Redis over Private Service Access with AUTH and in-transit encryption. With
+chart `1.12.2`, keep `mount_managed_redis_ca = false`; Terraform retains
+ownership of the instance but does not pass `REDIS_URL` to the chart. The
+bundled Redis deployment remains disabled.
 
 > **Managed Redis TLS prerequisite:** Memorystore signs its endpoint with the
 > private CA exposed by the sensitive `redis_server_ca_certificate` output.

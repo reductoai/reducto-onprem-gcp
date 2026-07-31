@@ -38,54 +38,57 @@ resource "helm_release" "reducto" {
   wait    = true
   timeout = var.helm_release_timeout
 
-  values = [
-    file("${path.module}/values/reducto.yaml"),
-    var.datadog_api_key != "" ? yamlencode(local.otel_env_vars) : "",
-    yamlencode({
-      # Chart 1.12.2 compatibility defaults for dual-stack DNS and Kubernetes
-      # 1.33 traffic-distribution validation.
-      dnsConfigNoAAAA        = false
-      setTrafficDistribution = "PreferClose"
-      http = {
-        service = {
-          annotations = {
-            "cloud.google.com/backend-config" = jsonencode({ ports = { "80" = local.backend_config_name } })
+  values = concat(
+    [
+      file("${path.module}/values/reducto.yaml"),
+      var.datadog_api_key != "" ? yamlencode(local.otel_env_vars) : "",
+      yamlencode({
+        # Chart 1.12.2 compatibility defaults for dual-stack DNS and Kubernetes
+        # 1.33 traffic-distribution validation.
+        dnsConfigNoAAAA        = false
+        setTrafficDistribution = "PreferClose"
+        http = {
+          service = {
+            annotations = {
+              "cloud.google.com/backend-config" = jsonencode({ ports = { "80" = local.backend_config_name } })
+            }
           }
         }
-      }
-      ingress = {
-        host = var.reducto_host
-      }
-      # Chart 1.12.2 contains Streaq, but the certified legacy baseline keeps
-      # it disabled until a deployment explicitly opts into those workloads.
-      streaqWorkerDefaults = {
-        enabled = false
-      }
-      streaqWorkers = {}
-      redis = {
-        enabled = false
-      }
-      # Keep the credentials JSON out of Deployment and Pod specs. Chart
-      # 1.12.2 stores secretEnv.stringData in a release-scoped Secret.
-      secretEnv = {
-        create = true
-        stringData = {
-          GOOGLE_APPLICATION_CREDENTIALS = local.service_account_key_json
+        ingress = {
+          host = var.reducto_host
         }
-      }
-      env = merge({
-        GCP_PROJECT_ID        = var.project_id
-        GCP_REGION            = var.region
-        GCP_API_KEY           = google_apikeys_key.vision.key_string
-        GCP_ACCESS_KEY_ID     = google_storage_hmac_key.s3_compatible_key.access_id
-        GCP_SECRET_ACCESS_KEY = google_storage_hmac_key.s3_compatible_key.secret
-        BUCKET                = google_storage_bucket.private_bucket.name
-        DATABASE_URL          = local.database_url
-        }, var.enable_managed_redis ? {
-        REDIS_URL = local.redis_url
-      } : {})
-    })
-  ]
+        # Chart 1.12.2 contains Streaq, but the certified legacy baseline keeps
+        # it disabled until a deployment explicitly opts into those workloads.
+        streaqWorkerDefaults = {
+          enabled = false
+        }
+        streaqWorkers = {}
+        redis = {
+          enabled = false
+        }
+        # Keep the credentials JSON out of Deployment and Pod specs. Chart
+        # 1.12.2 stores secretEnv.stringData in a release-scoped Secret.
+        secretEnv = {
+          create = true
+          stringData = {
+            GOOGLE_APPLICATION_CREDENTIALS = local.service_account_key_json
+          }
+        }
+        env = merge({
+          GCP_PROJECT_ID        = var.project_id
+          GCP_REGION            = var.region
+          GCP_API_KEY           = google_apikeys_key.vision.key_string
+          GCP_ACCESS_KEY_ID     = google_storage_hmac_key.s3_compatible_key.access_id
+          GCP_SECRET_ACCESS_KEY = google_storage_hmac_key.s3_compatible_key.secret
+          BUCKET                = google_storage_bucket.private_bucket.name
+          DATABASE_URL          = local.database_url
+          }, var.enable_managed_redis && var.mount_managed_redis_ca ? {
+          REDIS_URL = local.redis_url
+        } : {})
+      })
+    ],
+    [for values_path in var.reducto_extra_values_files : file(values_path)],
+  )
 
   depends_on = [
     module.gke,
