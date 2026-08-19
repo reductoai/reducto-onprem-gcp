@@ -1,5 +1,7 @@
-resource "random_string" "db_password" {
-  length  = 16
+resource "random_password" "db_password" {
+  count = var.database_password == null ? 1 : 0
+
+  length  = 32
   special = false
   upper   = true
   lower   = true
@@ -53,7 +55,7 @@ module "pg" {
   disk_autoresize_limit = 100
 
   user_name     = local.db_user
-  user_password = random_string.db_password.result
+  user_password = local.db_password
 
   depends_on = [module.private_service_access]
 }
@@ -62,5 +64,6 @@ module "pg" {
 locals {
   db_name      = "reducto"
   db_user      = "reducto"
-  database_url = "postgresql://${local.db_user}:${random_string.db_password.result}@${module.pg.private_ip_address}:5432/${local.db_name}"
+  db_password  = coalesce(var.database_password, try(random_password.db_password[0].result, null))
+  database_url = "postgresql://${local.db_user}:${local.db_password}@${module.pg.private_ip_address}:5432/${local.db_name}"
 }

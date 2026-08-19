@@ -36,3 +36,20 @@ output "vpc_network_name" {
   description = "The name of the VPC network created for Reducto"
   value       = module.network.network_name
 }
+
+output "redis_host" {
+  description = "Private Memorystore endpoint."
+  value       = var.enable_managed_redis ? google_redis_instance.reducto[0].host : null
+}
+
+output "redis_url" {
+  description = "Authenticated TLS URL for the managed Redis instance."
+  value       = var.enable_managed_redis ? local.redis_url : null
+  sensitive   = true
+}
+
+output "redis_server_ca_certificate" {
+  description = "PEM-encoded private CA required to verify the managed Redis TLS endpoint."
+  value       = var.enable_managed_redis ? google_redis_instance.reducto[0].server_ca_certs[0].cert : null
+  sensitive   = true
+}

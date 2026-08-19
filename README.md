@@ -59,14 +59,85 @@ reducto_host               = "reducto.yourdomain.com"
 reducto_helm_chart_version = "..."
 reducto_helm_repo_username = "your-username"
 reducto_helm_repo_password = "your-password"
+
+enable_managed_redis = true
 ```
 
 And then:
 
 ```sh
 terraform init
+
+# Required once in a new project. GKE's module queries available versions
+# during planning, so its API must be active before the first full plan.
+terraform apply -target=google_project_service.services
+
 terraform plan
 terraform apply
+```
+
+For an existing deployment, preserve the current Cloud SQL application
+password by supplying the sensitive `database_password` input before applying
+this update. Leaving it null generates a password only for a fresh deployment.
+Never rotate this value as part of adding managed Redis or changing Terraform
+ownership.
+
+The default chart version is `1.12.6`. Its optional queue workers remain disabled by
+default. When `enable_managed_redis` is true, Terraform provisions Memorystore
+for Redis over Private Service Access with AUTH and in-transit encryption,
+creates the `reducto-redis-ca` Secret from Memorystore's private CA, and passes
+the TLS URL and chart `redis.tls.*` settings to the release. The bundled Redis
+deployment remains disabled. Chart `1.12.6` now feature-detects traffic
+distribution, but the explicit `PreferClose` override remains because managed
+control planes in the 1.31–1.33 range accept `PreferClose` while
+`PreferSameZone` requires newer API versions; `dnsConfigNoAAAA: false` also
+remains for this portable dual-stack deployment.
+
+## New Reducto Architecture bridge (chart 1.12.6)
+
+For the v1.12.6 → v1.13 migration, pin the chart, provision Memorystore, and
+layer the queue worker topology through `reducto_extra_values_files`. Keep the
+legacy worker enabled during the bridge and start every rollout ratio at `0`;
+follow the migration runbook for the full drain and ramp procedure.
+
+```hcl
+reducto_helm_chart_version = "1.12.6"
+enable_managed_redis       = true
+reducto_extra_values_files = ["redis-queue-bridge.yaml"]
+```
+
+The CPU worker reserves 14 CPU and 26Gi; size the customer node pool to fit
+that reservation before enabling the bridge.
+
+`redis-queue-bridge.yaml`:
+
+```yaml
+env:
+  WORKER_PROVIDER: STREAQ_LOCAL
+  PARSE_STREAQ_TRAINABLE_ROLLOUT_RATIO: "0"
+  PARSE_STREAQ_NON_TRAINABLE_ROLLOUT_RATIO: "0"
+  STREAQ_CPU_WORKER_ROLLOUT_PCT: "0"
+  STREAQ_CPU_COMPLETION_TRAINABLE_ROLLOUT_PCT: "0"
+  STREAQ_CPU_COMPLETION_NON_TRAINABLE_ROLLOUT_PCT: "0"
+streaqWorkers:
+  io:
+    enabled: true
+    workerName: io
+  cpu:
+    enabled: true
+    workerName: cpu
+    useFullImage: true
+    workerCount: 1
+    replicaCount: 1
+    kedaScaler: false
+    resources:
+      requests:
+        cpu: 14
+        memory: 26Gi
+      limits:
+        memory: 26Gi
+worker:
+  enabled: true
 ```
 
 ### DNS 

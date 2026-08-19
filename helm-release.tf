@@ -35,29 +35,71 @@ resource "helm_release" "reducto" {
 
   chart   = var.reducto_helm_chart_oci
   version = var.reducto_helm_chart_version
-  wait    = false
+  wait    = true
+  timeout = var.helm_release_timeout
 
-  values = [
-    "${file("${path.module}/values/reducto.yaml")}",
-    var.datadog_api_key != "" ? yamlencode(local.otel_env_vars) : "",
-    <<-EOT
-    http:
-      service:
-        annotations:
-          cloud.google.com/backend-config: '{"ports": {"80":"${local.backend_config_name}"}}'
-    ingress:
-      host: ${var.reducto_host}
-    env:
-      GCP_PROJECT_ID: ${var.project_id}
-      GCP_REGION: ${var.region}
-      GCP_API_KEY: ${google_apikeys_key.vision.key_string}
-      GCP_ACCESS_KEY_ID: ${google_storage_hmac_key.s3_compatible_key.access_id}
-      GCP_SECRET_ACCESS_KEY: ${google_storage_hmac_key.s3_compatible_key.secret}
-      GOOGLE_APPLICATION_CREDENTIALS: ${local.service_account_key_json}
-      BUCKET: ${google_storage_bucket.private_bucket.name}
-      DATABASE_URL: ${local.database_url}
-    EOT
-  ]
+  values = concat(
+    [
+      file("${path.module}/values/reducto.yaml"),
+      var.datadog_api_key != "" ? yamlencode(local.otel_env_vars) : "",
+      yamlencode({
+        # Chart 1.12.6 feature-detects PreferSameZone/PreferClose, but
+        # managed control planes in the 1.31-1.33 range accept PreferClose
+        # while PreferSameZone requires newer API versions. Keep the
+        # portable value explicit; feature detection remains available when
+        # this key is unset.
+        dnsConfigNoAAAA        = false
+        setTrafficDistribution = "PreferClose"
+        http = {
+          service = {
+            annotations = {
+              "cloud.google.com/backend-config" = jsonencode({ ports = { "80" = local.backend_config_name } })
+            }
+          }
+        }
+        ingress = {
+          host = var.reducto_host
+        }
+        # Chart 1.12.6 contains queue worker templates, but the legacy
+        # baseline keeps them disabled until a deployment explicitly opts in.
+        streaqWorkerDefaults = {
+          enabled = false
+        }
+        streaqWorkers = {}
+        # Keep the credentials JSON out of Deployment and Pod specs. Chart
+        # 1.12.6 stores secretEnv.stringData in a release-scoped Secret.
+        secretEnv = {
+          create = true
+          stringData = {
+            GOOGLE_APPLICATION_CREDENTIALS = local.service_account_key_json
+          }
+        }
+        env = merge({
+          GCP_PROJECT_ID        = var.project_id
+          GCP_REGION            = var.region
+          GCP_API_KEY           = google_apikeys_key.vision.key_string
+          GCP_ACCESS_KEY_ID     = google_storage_hmac_key.s3_compatible_key.access_id
+          GCP_SECRET_ACCESS_KEY = google_storage_hmac_key.s3_compatible_key.secret
+          BUCKET                = google_storage_bucket.private_bucket.name
+          DATABASE_URL          = local.database_url
+          }, local.managed_redis_consumed ? {
+          REDIS_URL = local.redis_url
+        } : {})
+        redis = merge(
+          { enabled = false },
+          local.managed_redis_consumed ? {
+            tls = {
+              existingSecret = "reducto-redis-ca"
+              key            = "ca.crt"
+              mountPath      = "/etc/reducto/redis-tls/ca.crt"
+              checksum       = sha256(google_redis_instance.reducto[0].server_ca_certs[0].cert)
+            }
+          } : {},
+        )
+      })
+    ],
+    [for values_path in var.reducto_extra_values_files : file(values_path)],
+  )
 
   depends_on = [
     module.gke,
@@ -65,5 +107,7 @@ resource "helm_release" "reducto" {
     module.network,
     helm_release.keda,
     kubectl_manifest.backend_config,
+    kubectl_manifest.redis_ca,
+    google_redis_instance.reducto,
   ]
 }

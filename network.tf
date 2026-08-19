@@ -6,7 +6,6 @@ module "network" {
   network_name = var.network_name
 
   bgp_best_path_selection_mode = "STANDARD"
-
   subnets = [
     {
       subnet_name           = var.subnet_name
@@ -35,6 +34,8 @@ module "network" {
       }
     ]
   }
+
+  depends_on = [google_project_service.services]
 }
 
 # NAT and router to allowed private nodes to download Reducto image

@@ -65,12 +65,20 @@ module "gke" {
     },
   ], var.extra_node_pools)
 
+  # Retain the shared cluster tag while avoiding generated node-pool tags that
+  # can exceed GCE's 63-character limit for long valid names.
+  node_pools_tags = {
+    default_values = [true, false]
+  }
+
   master_authorized_networks = [
     for cidr in concat(var.control_plane_allowed_cidrs, [var.subnet_cidr, var.pods_cidr, var.services_cidr]) : {
       cidr_block   = cidr
       display_name = "control plane authorized networks"
     }
   ]
+
+  depends_on = [module.network]
 }
 
 # GKE Autopilot

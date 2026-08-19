@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 6.43.0, < 7"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 6.43.0, < 7"
+    }
     helm = {
       source  = "hashicorp/helm"
       version = "~> 3.0"
@@ -13,6 +17,10 @@ terraform {
     kubectl = {
       source  = "alekc/kubectl"
       version = ">= 2.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.7"
     }
   }
 }
@@ -41,6 +49,13 @@ provider "kubectl" {
 }
 
 provider "google" {
+  project               = var.project_id
+  region                = var.region
+  user_project_override = true
+  billing_project       = var.billing_project_id != "" ? var.billing_project_id : var.project_id
+}
+
+provider "google-beta" {
   project               = var.project_id
   region                = var.region
   user_project_override = true
