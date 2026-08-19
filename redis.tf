@@ -17,6 +17,13 @@ resource "google_redis_instance" "reducto" {
 
   transit_encryption_mode = "SERVER_AUTHENTICATION"
 
+  lifecycle {
+    precondition {
+      condition     = !var.enable_managed_redis || var.mount_managed_redis_ca == false || local.chart_supports_redis_ca
+      error_message = "enable_managed_redis=true requires a supported chart pin for the Redis CA mount; pin 1.12.3, 1.12.4, or 1.12.6, or set mount_managed_redis_ca=false deliberately."
+    }
+  }
+
   depends_on = [
     google_project_service.services,
     module.private_service_access,

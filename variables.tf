@@ -171,13 +171,6 @@ variable "mount_managed_redis_ca" {
   default     = null
 }
 
-check "managed_redis_ca_requires_supported_chart" {
-  assert {
-    condition     = !var.enable_managed_redis || var.mount_managed_redis_ca == false || local.chart_supports_redis_ca
-    error_message = "enable_managed_redis=true requires a supported chart pin for the Redis CA mount; pin 1.12.3, 1.12.4, or 1.12.6, or set mount_managed_redis_ca=false deliberately."
-  }
-}
-
 variable "managed_redis_tier" {
   type        = string
   description = "Memorystore service tier. Use BASIC only for disposable development environments."

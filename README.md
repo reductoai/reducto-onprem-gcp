@@ -88,9 +88,10 @@ for Redis over Private Service Access with AUTH and in-transit encryption,
 creates the `reducto-redis-ca` Secret from Memorystore's private CA, and passes
 the TLS URL and chart `redis.tls.*` settings to the release. The bundled Redis
 deployment remains disabled. Chart `1.12.6` now feature-detects traffic
-distribution, but the explicit `PreferClose` override remains because AKS 1.33
-only accepts that value; `dnsConfigNoAAAA: false` also remains for this
-portable dual-stack deployment.
+distribution, but the explicit `PreferClose` override remains because managed
+control planes in the 1.31–1.33 range accept `PreferClose` while
+`PreferSameZone` requires newer API versions; `dnsConfigNoAAAA: false` also
+remains for this portable dual-stack deployment.
 
 ## Streaq bridge (chart 1.12.6)
 
