@@ -144,7 +144,7 @@ variable "reducto_helm_repo_password" {
 variable "reducto_helm_chart_version" {
   type        = string
   description = "Reducto Helm Chart version, obtain latest version from https://docs.reducto.ai/onprem/changelog"
-  default     = "1.12.2"
+  default     = "1.12.6"
 }
 
 variable "helm_release_timeout" {
@@ -166,14 +166,15 @@ variable "enable_managed_redis" {
 
 variable "mount_managed_redis_ca" {
   type        = bool
-  description = "Whether Reducto consumes managed Redis with its private CA mounted. The legacy root cannot mount that CA, so this must remain false."
-  default     = false
+  nullable    = true
+  description = "Whether Reducto consumes managed Redis with its private CA mounted. When null, the mount is enabled only for chart versions verified to support redis.tls.*."
+  default     = null
 }
 
-check "legacy_managed_redis_is_unconsumed" {
+check "managed_redis_ca_requires_supported_chart" {
   assert {
-    condition     = !var.mount_managed_redis_ca
-    error_message = "The legacy root cannot mount Memorystore's private CA. Keep mount_managed_redis_ca=false and retain Redis as an unconsumed Terraform-owned resource."
+    condition     = var.mount_managed_redis_ca != true || contains(local.chart_versions_with_redis_ca, var.reducto_helm_chart_version)
+    error_message = "mount_managed_redis_ca=true requires a chart version that supports redis.tls.*."
   }
 }
 

@@ -43,10 +43,8 @@ resource "helm_release" "reducto" {
       file("${path.module}/values/reducto.yaml"),
       var.datadog_api_key != "" ? yamlencode(local.otel_env_vars) : "",
       yamlencode({
-        # Chart 1.12.2 compatibility defaults for dual-stack DNS and Kubernetes
-        # 1.33 traffic-distribution validation.
-        dnsConfigNoAAAA        = false
-        setTrafficDistribution = "PreferClose"
+        # Keep dual-stack DNS behavior explicit for this portable deployment.
+        dnsConfigNoAAAA = false
         http = {
           service = {
             annotations = {
@@ -57,17 +55,14 @@ resource "helm_release" "reducto" {
         ingress = {
           host = var.reducto_host
         }
-        # Chart 1.12.2 contains Streaq, but the certified legacy baseline keeps
-        # it disabled until a deployment explicitly opts into those workloads.
+        # Chart 1.12.6 contains Streaq, but the legacy baseline keeps it
+        # disabled until a deployment explicitly opts into those workloads.
         streaqWorkerDefaults = {
           enabled = false
         }
         streaqWorkers = {}
-        redis = {
-          enabled = false
-        }
         # Keep the credentials JSON out of Deployment and Pod specs. Chart
-        # 1.12.2 stores secretEnv.stringData in a release-scoped Secret.
+        # 1.12.6 stores secretEnv.stringData in a release-scoped Secret.
         secretEnv = {
           create = true
           stringData = {
@@ -82,9 +77,20 @@ resource "helm_release" "reducto" {
           GCP_SECRET_ACCESS_KEY = google_storage_hmac_key.s3_compatible_key.secret
           BUCKET                = google_storage_bucket.private_bucket.name
           DATABASE_URL          = local.database_url
-          }, var.enable_managed_redis && var.mount_managed_redis_ca ? {
+          }, local.managed_redis_consumed ? {
           REDIS_URL = local.redis_url
         } : {})
+        redis = merge(
+          { enabled = false },
+          local.managed_redis_consumed ? {
+            tls = {
+              existingSecret = "reducto-redis-ca"
+              key            = "ca.crt"
+              mountPath      = "/etc/reducto/redis-tls/ca.crt"
+              checksum       = sha256(google_redis_instance.reducto[0].server_ca_certs[0].cert)
+            }
+          } : {},
+        )
       })
     ],
     [for values_path in var.reducto_extra_values_files : file(values_path)],
@@ -96,6 +102,7 @@ resource "helm_release" "reducto" {
     module.network,
     helm_release.keda,
     kubectl_manifest.backend_config,
+    kubectl_manifest.redis_ca,
     google_redis_instance.reducto,
   ]
 }
