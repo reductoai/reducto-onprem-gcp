@@ -43,8 +43,11 @@ resource "helm_release" "reducto" {
       file("${path.module}/values/reducto.yaml"),
       var.datadog_api_key != "" ? yamlencode(local.otel_env_vars) : "",
       yamlencode({
-        # Keep dual-stack DNS behavior explicit for this portable deployment.
-        dnsConfigNoAAAA = false
+        # Chart 1.12.6 feature-detects PreferSameZone/PreferClose, but AKS
+        # 1.33 only accepts PreferClose. Keep the portable value explicit;
+        # feature detection remains available when this key is unset.
+        dnsConfigNoAAAA        = false
+        setTrafficDistribution = "PreferClose"
         http = {
           service = {
             annotations = {

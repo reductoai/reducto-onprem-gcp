@@ -11,6 +11,9 @@ resource "google_redis_instance" "reducto" {
   auth_enabled       = true
   authorized_network = module.network.network_self_link
   connect_mode       = "PRIVATE_SERVICE_ACCESS"
+  redis_configs = {
+    "maxmemory-policy" = "noeviction"
+  }
 
   transit_encryption_mode = "SERVER_AUTHENTICATION"
 
@@ -21,7 +24,7 @@ resource "google_redis_instance" "reducto" {
 }
 
 locals {
-  chart_versions_with_redis_ca = ["1.12.6"]
+  chart_versions_with_redis_ca = ["1.12.3", "1.12.4", "1.12.6"]
   chart_supports_redis_ca      = contains(local.chart_versions_with_redis_ca, var.reducto_helm_chart_version)
   mount_managed_redis_ca       = coalesce(var.mount_managed_redis_ca, local.chart_supports_redis_ca)
   managed_redis_consumed       = var.enable_managed_redis && local.mount_managed_redis_ca

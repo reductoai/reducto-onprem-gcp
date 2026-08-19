@@ -60,8 +60,7 @@ reducto_helm_chart_version = "..."
 reducto_helm_repo_username = "your-username"
 reducto_helm_repo_password = "your-password"
 
-# Keep disabled until the Memorystore private CA is wired into the chart.
-enable_managed_redis = false
+enable_managed_redis = true
 ```
 
 And then:
@@ -88,9 +87,9 @@ default. When `enable_managed_redis` is true, Terraform provisions Memorystore
 for Redis over Private Service Access with AUTH and in-transit encryption,
 creates the `reducto-redis-ca` Secret from Memorystore's private CA, and passes
 the TLS URL and chart `redis.tls.*` settings to the release. The bundled Redis
-deployment remains disabled. Chart `1.12.6` now selects traffic distribution
-based on the Kubernetes version, so the old explicit `PreferClose` workaround
-is no longer needed; the explicit `dnsConfigNoAAAA: false` remains for this
+deployment remains disabled. Chart `1.12.6` now feature-detects traffic
+distribution, but the explicit `PreferClose` override remains because AKS 1.33
+only accepts that value; `dnsConfigNoAAAA: false` also remains for this
 portable dual-stack deployment.
 
 ## Streaq bridge (chart 1.12.6)
@@ -106,6 +105,9 @@ enable_managed_redis       = true
 reducto_extra_values_files = ["streaq-bridge.yaml"]
 ```
 
+The CPU worker reserves 14 CPU and 26Gi; size the customer node pool to fit
+that reservation before enabling the bridge.
+
 `streaq-bridge.yaml`:
 
 ```yaml
@@ -120,11 +122,19 @@ streaqWorkers:
   io:
     enabled: true
     workerName: io
-    useFullImage: true
   cpu:
     enabled: true
     workerName: cpu
     useFullImage: true
+    workerCount: 1
+    replicaCount: 1
+    kedaScaler: false
+    resources:
+      requests:
+        cpu: 14
+        memory: 26Gi
+      limits:
+        memory: 26Gi
 worker:
   enabled: true
 ```
