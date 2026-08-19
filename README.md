@@ -93,7 +93,7 @@ control planes in the 1.31–1.33 range accept `PreferClose` while
 `PreferSameZone` requires newer API versions; `dnsConfigNoAAAA: false` also
 remains for this portable dual-stack deployment.
 
-## Redis queue bridge (chart 1.12.6)
+## New Reducto Architecture bridge (chart 1.12.6)
 
 For the v1.12.6 → v1.13 migration, pin the chart, provision Memorystore, and
 layer the queue worker topology through `reducto_extra_values_files`. Keep the
