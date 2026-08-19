@@ -82,7 +82,7 @@ this update. Leaving it null generates a password only for a fresh deployment.
 Never rotate this value as part of adding managed Redis or changing Terraform
 ownership.
 
-The default chart version is `1.12.6`. Its Streaq workloads remain disabled by
+The default chart version is `1.12.6`. Its optional queue workers remain disabled by
 default. When `enable_managed_redis` is true, Terraform provisions Memorystore
 for Redis over Private Service Access with AUTH and in-transit encryption,
 creates the `reducto-redis-ca` Secret from Memorystore's private CA, and passes
@@ -93,23 +93,23 @@ control planes in the 1.31–1.33 range accept `PreferClose` while
 `PreferSameZone` requires newer API versions; `dnsConfigNoAAAA: false` also
 remains for this portable dual-stack deployment.
 
-## Streaq bridge (chart 1.12.6)
+## Redis queue bridge (chart 1.12.6)
 
 For the v1.12.6 → v1.13 migration, pin the chart, provision Memorystore, and
-layer the worker topology through `reducto_extra_values_files`. Keep the legacy
-worker enabled during the bridge and start every rollout ratio at `0`; follow
-the migration runbook for the full drain and ramp procedure.
+layer the queue worker topology through `reducto_extra_values_files`. Keep the
+legacy worker enabled during the bridge and start every rollout ratio at `0`;
+follow the migration runbook for the full drain and ramp procedure.
 
 ```hcl
 reducto_helm_chart_version = "1.12.6"
 enable_managed_redis       = true
-reducto_extra_values_files = ["streaq-bridge.yaml"]
+reducto_extra_values_files = ["redis-queue-bridge.yaml"]
 ```
 
 The CPU worker reserves 14 CPU and 26Gi; size the customer node pool to fit
 that reservation before enabling the bridge.
 
-`streaq-bridge.yaml`:
+`redis-queue-bridge.yaml`:
 
 ```yaml
 env:

@@ -60,8 +60,8 @@ resource "helm_release" "reducto" {
         ingress = {
           host = var.reducto_host
         }
-        # Chart 1.12.6 contains Streaq, but the legacy baseline keeps it
-        # disabled until a deployment explicitly opts into those workloads.
+        # Chart 1.12.6 contains queue worker templates, but the legacy
+        # baseline keeps them disabled until a deployment explicitly opts in.
         streaqWorkerDefaults = {
           enabled = false
         }

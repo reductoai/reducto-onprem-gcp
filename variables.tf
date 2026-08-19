@@ -206,7 +206,7 @@ variable "reducto_helm_chart_oci" {
 }
 
 variable "reducto_extra_values_files" {
-  description = "Paths to additional Helm values files layered last. Use this for deployment-specific workload settings such as Streaq."
+  description = "Paths to additional Helm values files layered last. Use this for deployment-specific queue worker settings."
   type        = list(string)
   default     = []
 
